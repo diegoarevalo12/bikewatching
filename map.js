@@ -11,7 +11,7 @@ const map = new mapboxgl.Map({
   maxZoom: 18 // Maximum allowed zoom
 });
 
-map.on('load', () => { 
+map.on('load', () => {
   // Add the Boston bike lanes data source
   map.addSource('boston_route', {
     type: 'geojson',
@@ -42,34 +42,25 @@ map.on('load', () => {
     type: 'line',
     source: 'cambridge_route',
     paint: {
-      'line-color': '#32D400',  // Bright orange for Cambridge bike lanes
+      'line-color': '#32D400',  // Bright green for Cambridge bike lanes
       'line-width': 5,          // Thicker lines
       'line-opacity': 0.6       // Slightly less transparent
     }
   });
 
+  // Load the Bluebikes station data using D3
+  const jsonurl = 'https://dsc106.com/labs/lab07/data/bluebikes-stations.json'; // Correct URL for Bluebikes data
+  d3.json(jsonurl).then(jsonData => {
+    console.log('Loaded JSON Data:', jsonData);  // Log to verify structure
+
+    // Access the stations array from the loaded JSON data
+    const stations = jsonData.data.stations;
+    console.log('Stations Array:', stations);  // Log stations array
+
+    // You can now add markers for each station here
+    // (This part would be handled in the next steps)
+  }).catch(error => {
+    console.error('Error loading JSON:', error);  // Handle errors if JSON loading fails
+  });
+
 });
-
-map.on('load', () => {
-    // Load the nested JSON file
-    const jsonurl = INPUT_BLUEBIKES_CSV_URL
-    d3.json(jsonurl).then(jsonData => {
-      console.log('Loaded JSON Data:', jsonData);  // Log to verify structure
-    }).catch(error => {
-      console.error('Error loading JSON:', error);  // Handle errors if JSON loading fails
-    });
-  });
-
-  map.on('load', () => {
-    // Load the nested JSON file
-    const jsonurl = INPUT_BLUEBIKES_CSV_URL
-    d3.json(jsonurl).then(jsonData => {
-      console.log('Loaded JSON Data:', jsonData);  // Log to verify structure
-    }).catch(error => {
-      console.error('Error loading JSON:', error);  // Handle errors if JSON loading fails
-    });
-  });
-
-const stations = jsonData.data.stations;
-console.log('Stations Array:', stations);
-
