@@ -11,6 +11,10 @@ const map = new mapboxgl.Map({
   maxZoom: 18 // Maximum allowed zoom
 });
 
+// Add an SVG element to the map container
+const svg = d3.select(map.getCanvasContainer()).append('svg');
+let stations = [];  // Initialize empty stations array
+
 map.on('load', () => {
   // Add the Boston bike lanes data source
   map.addSource('boston_route', {
@@ -49,18 +53,49 @@ map.on('load', () => {
   });
 
   // Load the Bluebikes station data using D3
-  const jsonurl = 'https://dsc106.com/labs/lab07/data/bluebikes-stations.json'; // Correct URL for Bluebikes data
+  const jsonurl = 'https://dsc106.com/labs/lab07/data/bluebikes-stations.json';
   d3.json(jsonurl).then(jsonData => {
-    console.log('Loaded JSON Data:', jsonData);  // Log to verify structure
+    console.log('Loaded JSON Data:', jsonData);
 
     // Access the stations array from the loaded JSON data
-    const stations = jsonData.data.stations;
-    console.log('Stations Array:', stations);  // Log stations array
+    stations = jsonData.data.stations;
+    console.log('Stations Array:', stations);
 
-    // You can now add markers for each station here
-    // (This part would be handled in the next steps)
+    // Function to get coordinates and project them on the map
+    function getCoords(station) {
+      const point = new mapboxgl.LngLat(+station.lon, +station.lat);  // Convert lon/lat to Mapbox LngLat
+      const { x, y } = map.project(point);  // Project to pixel coordinates
+      return { cx: x, cy: y };  // Return as object for use in SVG attributes
+    }
+
+    // Append circles to the SVG for each station
+    const circles = svg.selectAll('circle')
+      .data(stations)
+      .enter()
+      .append('circle')
+      .attr('r', 5)               // Radius of the circle
+      .attr('fill', 'steelblue')  // Circle fill color
+      .attr('stroke', 'white')    // Circle border color
+      .attr('stroke-width', 1)    // Circle border thickness
+      .attr('opacity', 0.8);      // Circle opacity
+
+    // Function to update circle positions when the map moves/zooms
+    function updatePositions() {
+      circles
+        .attr('cx', d => getCoords(d).cx)  // Set the x-position using projected coordinates
+        .attr('cy', d => getCoords(d).cy); // Set the y-position using projected coordinates
+    }
+
+    // Initial position update when map loads
+    updatePositions();
+
+    // Reposition markers on map interactions
+    map.on('move', updatePositions);     // Update during map movement
+    map.on('zoom', updatePositions);     // Update during zooming
+    map.on('resize', updatePositions);   // Update on window resize
+    map.on('moveend', updatePositions);  // Final adjustment after movement ends
+
   }).catch(error => {
     console.error('Error loading JSON:', error);  // Handle errors if JSON loading fails
   });
-
 });
