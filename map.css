@@ -1,30 +1,89 @@
 html, body {
     margin: 0;
-    padding: 5;
+    padding: 0;
     height: 100%;
     width: 100%;
     display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center;     /* Center vertically */
+    flex-direction: column; /* Stack elements vertically */
   }
-     
+  
   #map {
-    width: 100%;    /* Adjust width to your desired size */
-    height: 100%;   /* Adjust height to your desired size */
+    width: 100%;    /* Full width */
+    height: 80%;    /* Take up 80% of the viewport */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow for effect */
     border-radius: 8px; /* Optional: rounded corners */
+    position: relative; /* Ensure position for SVG overlay */
   }
-
+  
   #map svg {
     position: absolute;
     z-index: 1;
     width: 100%;
     height: 100%;
-    pointer-events: auto;
-  }  
+  }
   
   svg circle {
     pointer-events: auto;
     z-index: 100;
-    cursor: pointer;  /* Allow pointer events for circles (enables hover tooltips) */
+    cursor: pointer;
+    --color-departures: steelblue;
+    --color-arrivals: darkorange;
+    --color: color-mix(
+      in oklch,
+      var(--color-departures) calc(100% * var(--departure-ratio)),
+      var(--color-arrivals)
+    );
+    fill: var(--color);  
   }
+  
+  /* Style the map circles */
+  #map circle {
+    stroke: white;
+    stroke-width: 1;
+    fill-opacity: 0.6;
+  }
+  
+  /* Legend container */
+  .legend-container {
+    margin-top: 20px;  /* Add space between map and legend */
+    padding: 10px;
+    z-index: 200;  /* Ensure it appears above other content */
+    background-color: rgba(255, 255, 255, 0.9); /* Add white background */
+    border: 1px solid #ccc; /* Add border for visibility */
+    display: flex;
+    justify-content: center; /* Center the legend */
+  }
+  
+  /* Legend layout */
+  .legend {
+    display: flex;
+    width: 100%; /* Take full width */
+    gap: 1px; /* Small gap between blocks */
+    margin-block: 15px;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .legend > div {
+    flex: 1; /* Each legend item takes equal space */
+    padding: 10px 30px; /* More horizontal padding than vertical */
+    color: white; /* Ensure contrast with background colors */
+    font-size: 14px;
+  }
+  
+  /* Departure ratio block colors */
+  .legend > div:nth-child(1) {
+    background-color: steelblue; /* More departures */
+    text-align: left;
+  }
+  
+  .legend > div:nth-child(2) {
+    background-color: purple; /* Balanced */
+    text-align: center;
+  }
+  
+  .legend > div:nth-child(3) {
+    background-color: darkorange; /* More arrivals */
+    text-align: right;
+  }
+  
